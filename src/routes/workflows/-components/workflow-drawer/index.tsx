@@ -6,33 +6,55 @@ import FunctionForm from "./forms/FunctionForm";
 
 const { Title } = Typography;
 
+export type FormData = {
+  name?: string;
+  description?: string;
+  functionType?: string;
+  [key: string]: unknown;
+};
+
 export type WorkflowDrawerProps = {
   open: boolean;
   onClose: () => void;
   selectedNode: Node | null;
+  onFormChange?: (nodeId: string, formData: FormData) => void;
 };
 
 const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
   open,
   onClose,
   selectedNode,
+  onFormChange,
 }) => {
-  // 根据节点类型渲染不同的表单组件
+  // Render form based on node type
   const renderForm = () => {
     if (!selectedNode) {
-      return <Empty description="请选择一个节点" />;
+      return <Empty description="Please select a node" />;
     }
 
-    // 从节点数据中获取类型
+    // Get node type
     const nodeType = selectedNode.type as Plugin;
 
-    // 根据节点类型渲染对应的表单
+    // Render form based on node type
     switch (nodeType) {
       case Plugin.FUNCTION:
-        return <FunctionForm node={selectedNode} />;
-      // 可以添加更多节点类型的表单
+        return (
+          <FunctionForm
+            node={selectedNode}
+            onChange={(formData) => {
+              if (onFormChange) {
+                onFormChange(selectedNode.id, formData);
+              }
+            }}
+          />
+        );
+      // Add more node types here
       default:
-        return <Empty description={`暂不支持 ${nodeType} 类型节点的配置`} />;
+        return (
+          <Empty
+            description={`Configuration for ${nodeType} nodes is not supported yet`}
+          />
+        );
     }
   };
 
@@ -41,8 +63,8 @@ const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
       title={
         <Title level={4}>
           {selectedNode
-            ? `配置: ${selectedNode.data?.label || "未命名节点"}`
-            : "节点配置"}
+            ? `Configure: ${selectedNode.data?.label || "Unnamed Node"}`
+            : "Node Configuration"}
         </Title>
       }
       placement="right"
@@ -55,6 +77,8 @@ const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
           paddingBottom: 80,
         },
       }}
+      // No footer with buttons - form data is saved automatically
+      footer={null}
     >
       {renderForm()}
     </Drawer>

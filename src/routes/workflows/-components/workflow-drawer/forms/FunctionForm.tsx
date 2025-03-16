@@ -1,36 +1,40 @@
-import React from "react";
-import { Form, Input, Button, Space, Select } from "antd";
+import React, { useEffect } from "react";
+import { Form, Input, Select } from "antd";
 import { Node } from "@xyflow/react";
+import { FormData } from "..";
 
-interface FunctionFormProps {
+export interface FunctionFormProps {
   node: Node;
+  onChange?: (formData: FormData) => void;
 }
 
-const FunctionForm: React.FC<FunctionFormProps> = ({ node }) => {
+const FunctionForm: React.FC<FunctionFormProps> = ({ node, onChange }) => {
   const [form] = Form.useForm();
 
-  // 初始化表单数据
-  React.useEffect(() => {
+  // Initialize form with node data
+  useEffect(() => {
     if (node && node.data) {
       form.setFieldsValue({
-        name: node.data.label || "",
+        name: node.data.name || "",
         description: node.data.description || "",
         functionType: node.data.functionType || "default",
-        // 可以添加更多字段
+        // Add more fields as needed
       });
     }
   }, [node, form]);
 
-  const handleSubmit = (values: any) => {
-    console.log("提交表单数据:", values);
-    // 这里可以添加更新节点数据的逻辑
+  // Handle form values change
+  const handleValuesChange = (_changedValues: unknown, allValues: FormData) => {
+    if (onChange) {
+      onChange(allValues);
+    }
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={handleSubmit}
+      onValuesChange={handleValuesChange}
       initialValues={{
         name: "",
         description: "",
@@ -39,39 +43,30 @@ const FunctionForm: React.FC<FunctionFormProps> = ({ node }) => {
     >
       <Form.Item
         name="name"
-        label="函数名称"
-        rules={[{ required: true, message: "请输入函数名称" }]}
+        label="Function Name"
+        rules={[{ required: true, message: "Please enter a function name" }]}
       >
-        <Input placeholder="请输入函数名称" />
+        <Input placeholder="Enter function name" />
       </Form.Item>
 
-      <Form.Item name="description" label="函数描述">
-        <Input.TextArea rows={4} placeholder="请输入函数描述" />
+      <Form.Item name="description" label="Description">
+        <Input.TextArea rows={4} placeholder="Enter function description" />
       </Form.Item>
 
       <Form.Item
         name="functionType"
-        label="函数类型"
-        rules={[{ required: true, message: "请选择函数类型" }]}
+        label="Function Type"
+        rules={[{ required: true, message: "Please select a function type" }]}
       >
         <Select>
-          <Select.Option value="default">默认函数</Select.Option>
-          <Select.Option value="http">HTTP 请求</Select.Option>
-          <Select.Option value="transform">数据转换</Select.Option>
-          <Select.Option value="custom">自定义函数</Select.Option>
+          <Select.Option value="default">Default Function</Select.Option>
+          <Select.Option value="http">HTTP Request</Select.Option>
+          <Select.Option value="transform">Data Transformation</Select.Option>
+          <Select.Option value="custom">Custom Function</Select.Option>
         </Select>
       </Form.Item>
 
-      <Form.Item>
-        <Space>
-          <Button type="primary" htmlType="submit">
-            保存
-          </Button>
-          <Button htmlType="button" onClick={() => form.resetFields()}>
-            重置
-          </Button>
-        </Space>
-      </Form.Item>
+      {/* No submit buttons - form data is saved automatically */}
     </Form>
   );
 };

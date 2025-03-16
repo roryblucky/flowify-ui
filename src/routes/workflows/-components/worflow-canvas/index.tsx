@@ -1,24 +1,18 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { humanId } from "human-id";
+import React from "react";
 import {
   ReactFlow,
   Background,
   Controls,
   MiniMap,
   BackgroundVariant,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
   NodeTypes,
-  Edge,
   EdgeTypes,
   ConnectionMode,
-  useReactFlow,
-  Node,
   MarkerType,
+  Node,
+  Edge,
 } from "@xyflow/react";
-import { Plugin, PluginMetadataMap } from "@/utils/constant";
+import { Plugin } from "@/utils/constant";
 import { FunctionPlugin } from "./convas/plugins/function-plugin";
 import { WorkflowResponse } from "@/api/types";
 import WorkflowDrawer from "../workflow-drawer";
@@ -26,12 +20,10 @@ import { LoopPlugin } from "./convas/plugins/loop-plugin";
 import { StartPlugin } from "./convas/plugins/begin-plugin";
 import { SwitchPlugin } from "./convas/plugins/switch-plugin";
 import { ButtonEdge } from "./convas/edge";
-import { message } from "antd";
-
-export type WorkflowEditorProps = {
-  workflowId: string;
-  workflow?: WorkflowResponse;
-};
+import { useWorkflowState } from "./hooks/useWorkflowState";
+import { useWorkflowConnections } from "./hooks/useWorkflowConnections";
+import { useWorkflowDragDrop } from "./hooks/useWorkflowDragDrop";
+import { useWorkflowForm } from "./hooks/useWorkflowForm";
 
 // Node type mapping
 const nodeTypes: NodeTypes = {
@@ -59,128 +51,38 @@ const defaultEdgeOptions = {
   zIndex: 1001,
 };
 
-const WorkflowEditor: React.FC<WorkflowEditorProps> = ({ workflow }) => {
-  // Initial nodes
-  const initialNodes: Node[] = [
-    {
-      id: "-1",
-      type: Plugin.START,
-      position: { x: 250, y: 100 },
-      data: {
-        label: Plugin.START,
-        icon: PluginMetadataMap[Plugin.START].icon,
-      },
-    },
-  ];
+export type WorkflowEditorProps = {
+  workflowId: string;
+  workflow?: WorkflowResponse;
+  onWorkflowChange?: (nodes: Node[], edges: Edge[]) => void;
+};
 
-  const initialEdges: Edge[] = [];
+/**
+ * WorkflowEditor Component
+ * A visual editor for creating and editing workflows using React Flow
+ */
+const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
+  workflow,
+  onWorkflowChange,
+}) => {
+  // Initialize workflow state
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } =
+    useWorkflowState({ workflow, onWorkflowChange });
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const { screenToFlowPosition, getNode } = useReactFlow();
+  // Initialize connection handlers
+  const { onConnect } = useWorkflowConnections({ setEdges });
 
-  useEffect(() => {
-    if (workflow && workflow.id) {
-      // TODO: loading workflow data
-      console.log("loading workflow data:", workflow);
-    }
-  }, [workflow]);
+  // Initialize drag and drop handlers
+  const { onDragOver, onDrop } = useWorkflowDragDrop({ setNodes });
 
-  // Handle connection validation and creation
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      // Validation 1: Check if source and target are the same node (self-connection)
-      if (connection.source === connection.target) {
-        message.error("Cannot connect a node to itself");
-        return;
-      }
-
-      // Get source and target nodes
-      const sourceNode = getNode(connection.source);
-      const targetNode = getNode(connection.target);
-
-      if (!sourceNode || !targetNode) {
-        return;
-      }
-
-      // Validation 2: Check if target is a Start node
-      if (targetNode.type === Plugin.START) {
-        message.error("Cannot connect to Start node");
-        return;
-      }
-
-      // Validation 3: Check for correct handle types (source to target)
-      // If connecting from source handle to source handle or target handle to target handle
-      if (
-        (connection.sourceHandle?.includes("source") &&
-          connection.targetHandle?.includes("source")) ||
-        (connection.sourceHandle?.includes("target") &&
-          connection.targetHandle?.includes("target"))
-      ) {
-        message.error("Invalid connection: Must connect from output to input");
-        return;
-      }
-
-      // If all validations pass, add the edge
-      setEdges((eds) => addEdge(connection, eds));
-    },
-    [getNode, setEdges]
-  );
-
-  const createNode = (type: Plugin, position: { x: number; y: number }) => {
-    const newNode: Node = {
-      id: humanId({ separator: "-", capitalize: false }),
-      type,
-      position,
-      data: {
-        label: type,
-        icon: PluginMetadataMap[type].icon,
-      },
-    };
-
-    return newNode;
-  };
-
-  // Handle drag over
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
-
-  // Handle drop
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-
-      const type = event.dataTransfer.getData(
-        "application/@xyflow/react"
-      ) as Plugin;
-
-      if (!type) {
-        return;
-      }
-
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-
-      const newNode = createNode(type, position);
-      setNodes((nds) => nds.concat(newNode));
-    },
-    [screenToFlowPosition, setNodes]
-  );
-
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node);
-    setDrawerOpen(true);
-  }, []);
-
-  const onDrawerClose = useCallback(() => {
-    setDrawerOpen(false);
-  }, []);
+  // Initialize form handlers
+  const {
+    selectedNode,
+    drawerOpen,
+    onNodeClick,
+    onDrawerClose,
+    onNodeFormChange,
+  } = useWorkflowForm({ setNodes });
 
   return (
     <>
@@ -208,6 +110,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({ workflow }) => {
         open={drawerOpen}
         onClose={onDrawerClose}
         selectedNode={selectedNode}
+        onFormChange={onNodeFormChange}
       />
     </>
   );

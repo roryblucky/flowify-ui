@@ -31,7 +31,7 @@ const WorkflowList = () => {
       <Spin spinning={isLoading}>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} >
           <WorkflowDialogProvider>
-            {workflowList?.items.map((workflow: WorkflowResponse) => (
+            {workflowList?.workflows.map((workflow: WorkflowResponse) => (
               <Col key={workflow.id} className="gutter-row" span={6}>
                 <div className="py-2">
                   <WorkflowCard workflow={workflow} />
