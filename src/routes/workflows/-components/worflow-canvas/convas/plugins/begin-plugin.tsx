@@ -13,7 +13,7 @@ export const StartPlugin: React.FC<NodeProps<StartPluginProps>> = ({
       `}
     >
       <Handle
-        id="start"
+        id="source-handle"
         type="source"
         position={Position.Right}
         className="handle-style"

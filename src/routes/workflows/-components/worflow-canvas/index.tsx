@@ -26,13 +26,14 @@ import { LoopPlugin } from "./convas/plugins/loop-plugin";
 import { StartPlugin } from "./convas/plugins/begin-plugin";
 import { SwitchPlugin } from "./convas/plugins/switch-plugin";
 import { ButtonEdge } from "./convas/edge";
+import { message } from "antd";
 
 export type WorkflowEditorProps = {
   workflowId: string;
   workflow?: WorkflowResponse;
 };
 
-// 节点类型映射
+// Node type mapping
 const nodeTypes: NodeTypes = {
   [Plugin.FUNCTION]: FunctionPlugin,
   [Plugin.START]: StartPlugin,
@@ -40,12 +41,12 @@ const nodeTypes: NodeTypes = {
   [Plugin.LOOP]: LoopPlugin,
 } as const;
 
-// 边类型映射
+// Edge type mapping
 const edgeTypes: EdgeTypes = {
   buttonEdge: ButtonEdge,
 };
 
-// 默认边配置
+// Default edge options
 const defaultEdgeOptions = {
   animated: true,
   markerEnd: {
@@ -58,10 +59,8 @@ const defaultEdgeOptions = {
   zIndex: 1001,
 };
 
-const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
-  workflow,
-}) => {
-  // 初始节点
+const WorkflowEditor: React.FC<WorkflowEditorProps> = ({ workflow }) => {
+  // Initial nodes
   const initialNodes: Node[] = [
     {
       id: "-1",
@@ -80,8 +79,7 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getNode } = useReactFlow();
 
   useEffect(() => {
     if (workflow && workflow.id) {
@@ -90,11 +88,45 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
     }
   }, [workflow]);
 
+  // Handle connection validation and creation
   const onConnect = useCallback(
     (connection: Connection) => {
+      // Validation 1: Check if source and target are the same node (self-connection)
+      if (connection.source === connection.target) {
+        message.error("Cannot connect a node to itself");
+        return;
+      }
+
+      // Get source and target nodes
+      const sourceNode = getNode(connection.source);
+      const targetNode = getNode(connection.target);
+
+      if (!sourceNode || !targetNode) {
+        return;
+      }
+
+      // Validation 2: Check if target is a Start node
+      if (targetNode.type === Plugin.START) {
+        message.error("Cannot connect to Start node");
+        return;
+      }
+
+      // Validation 3: Check for correct handle types (source to target)
+      // If connecting from source handle to source handle or target handle to target handle
+      if (
+        (connection.sourceHandle?.includes("source") &&
+          connection.targetHandle?.includes("source")) ||
+        (connection.sourceHandle?.includes("target") &&
+          connection.targetHandle?.includes("target"))
+      ) {
+        message.error("Invalid connection: Must connect from output to input");
+        return;
+      }
+
+      // If all validations pass, add the edge
       setEdges((eds) => addEdge(connection, eds));
     },
-    [setEdges]
+    [getNode, setEdges]
   );
 
   const createNode = (type: Plugin, position: { x: number; y: number }) => {
@@ -111,13 +143,13 @@ const WorkflowEditor: React.FC<WorkflowEditorProps> = ({
     return newNode;
   };
 
-  // 处理拖拽结束
+  // Handle drag over
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  // 处理放置
+  // Handle drop
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();

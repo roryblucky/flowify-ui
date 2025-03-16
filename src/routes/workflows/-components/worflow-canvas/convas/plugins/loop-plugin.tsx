@@ -13,13 +13,13 @@ export const LoopPlugin: React.FC<NodeProps<LoopPluginProps>> = ({
       `}
     >
       <Handle
-        id="s"
+        id="target-handle"
         type="target"
         position={Position.Left}
         className="handle-style"
       />
       <Handle
-        id="t"
+        id="source-handle"
         type="source"
         position={Position.Right}
         className="handle-style"
