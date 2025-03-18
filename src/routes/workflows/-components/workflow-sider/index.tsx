@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Button, Tooltip, Flex, Divider } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Plugin, pluginMenuList } from "@/utils/constant";
+import { Plugin, pluginMenuList } from "@/types/plugins";
 
 const { Sider } = Layout;
 

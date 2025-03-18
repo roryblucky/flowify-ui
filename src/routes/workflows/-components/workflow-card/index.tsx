@@ -1,15 +1,19 @@
 import React from "react";
 import { WorkflowResponse } from "@/api/types";
-import { Card, MenuProps } from "antd";
+import { Card, MenuProps, Modal, message } from "antd";
 import OperateDropdown from "@/components/operate-dropdown";
 import { useWorkflowDialog } from "../workflow-dialog/WorkflowDialogProvider";
 import { useNavigate } from "@tanstack/react-router";
+import { useDeleteWorkflow } from "@/api/hooks/workflow";
 
 export const WorkflowCard: React.FC<{ workflow: WorkflowResponse }> = ({
   workflow,
 }) => {
   const { openEditDialog } = useWorkflowDialog();
   const navigate = useNavigate();
+  // Initialize the delete workflow mutation
+  const deleteWorkflow = useDeleteWorkflow();
+
   const handleCardClick = () => {
     navigate({
       from: "/workflows",
@@ -38,10 +42,36 @@ export const WorkflowCard: React.FC<{ workflow: WorkflowResponse }> = ({
     },
   ];
 
+  /**
+   * Handles menu item clicks
+   * - edit: Opens the edit dialog
+   * - remove: Shows confirmation dialog before deletion
+   */
   const handleMenuClick: MenuProps["onClick"] = (e) => {
     e.domEvent.stopPropagation();
     if (e.key === "edit") {
       openEditDialog(workflow);
+    } else if (e.key === "remove") {
+      // Show confirmation dialog before deleting
+      Modal.confirm({
+        title: "Delete Workflow",
+        content: `Are you sure you want to delete '${workflow.name}'? This action cannot be undone.`,
+        okText: "Delete",
+        okType: "danger",
+        cancelText: "Cancel",
+        onOk: async () => {
+          try {
+            // Call the delete mutation
+            await deleteWorkflow.mutateAsync(workflow.id);
+            message.success(`Workflow '${workflow.name}' has been deleted`);
+          } catch (error: unknown) {
+            // Handle error case with proper type checking
+            const errorMessage =
+              error instanceof Error ? error.message : "Unknown error occurred";
+            message.error(`Failed to delete workflow: ${errorMessage}`);
+          }
+        },
+      });
     }
   };
 

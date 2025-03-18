@@ -1,7 +1,7 @@
 import { Node, useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import { humanId } from "human-id";
-import { Plugin, PluginMetadataMap } from "@/utils/constant";
+import { Plugin, PluginMetadataMap } from "@/types/plugins";
 
 type UseWorkflowDragDropProps = {
     setNodes: (nodes: Node[] | ((nodes: Node[]) => Node[])) => void;
@@ -22,7 +22,7 @@ export const useWorkflowDragDrop = ({ setNodes }: UseWorkflowDragDropProps): Use
     // Create a new node with given type and position
     const createNode = useCallback((type: Plugin, position: { x: number; y: number }): Node => {
         return {
-            id: humanId({ separator: "-", capitalize: false }),
+            id: `${type}_${humanId({ separator: "-", capitalize: false })}`,
             type,
             position,
             data: {

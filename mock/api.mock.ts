@@ -201,5 +201,18 @@ export default defineMock([
         },
         status: 200,
     },
+    {
+        url: '/api/workflows/:id',
+        method: 'DELETE',
+        body: (req) => {
+            const id = req.params.id;
+            const index = mockWorkflows.findIndex(w => w.id === id);
+            mockWorkflows.splice(index, 1);
+            return {
+                message: "Workflow deleted successfully"
+            };
+        },
+        status: 200,
+    }
 ]);
 

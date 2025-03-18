@@ -1,7 +1,7 @@
-import { FunctionPluginProps } from "@/types/plugins";
+import { IfElsePluginProps } from "@/types/plugins";
 import { Position, Handle, NodeProps } from "@xyflow/react";
 
-export const FunctionPlugin: React.FC<NodeProps<FunctionPluginProps>> = ({
+export const IfElsePlugin: React.FC<NodeProps<IfElsePluginProps>> = ({
   data,
   selected,
 }) => {

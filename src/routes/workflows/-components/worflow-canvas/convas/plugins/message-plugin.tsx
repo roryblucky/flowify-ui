@@ -1,7 +1,7 @@
-import { SwitchPluginProps } from "../../types";
+import { MessagePluginProps } from "@/types/plugins";
 import { Position, Handle, NodeProps } from "@xyflow/react";
 
-export const SwitchPlugin: React.FC<NodeProps<SwitchPluginProps>> = ({
+export const MessagePlugin: React.FC<NodeProps<MessagePluginProps>> = ({
   data,
   selected,
 }) => {

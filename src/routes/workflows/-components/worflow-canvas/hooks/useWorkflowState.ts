@@ -11,7 +11,7 @@ import {
     applyEdgeChanges,
 } from "@xyflow/react";
 import { useEffect, useCallback } from "react";
-import { Plugin, PluginMetadataMap } from "@/utils/constant";
+import { Plugin, PluginMetadataMap } from "@/types/plugins";
 import { WorkflowResponse } from "@/api/types";
 import { message } from "antd";
 

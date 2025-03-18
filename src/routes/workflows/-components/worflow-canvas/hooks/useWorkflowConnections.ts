@@ -1,7 +1,7 @@
 import { Connection, Edge, useReactFlow, addEdge } from "@xyflow/react";
 import { useCallback } from "react";
 import { message } from "antd";
-import { Plugin } from "@/utils/constant";
+import { Plugin } from "@/types/plugins";
 
 type UseWorkflowConnectionsProps = {
     setEdges: (edges: Edge[] | ((edges: Edge[]) => Edge[])) => void;

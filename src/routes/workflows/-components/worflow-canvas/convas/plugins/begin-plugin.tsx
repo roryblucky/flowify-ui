@@ -1,4 +1,4 @@
-import { StartPluginProps } from "../../types";
+import { StartPluginProps } from "@/types/plugins";
 import { Position, Handle, NodeProps } from "@xyflow/react";
 
 export const StartPlugin: React.FC<NodeProps<StartPluginProps>> = ({

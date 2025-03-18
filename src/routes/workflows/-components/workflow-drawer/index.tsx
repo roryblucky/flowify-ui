@@ -1,7 +1,7 @@
 import React from "react";
 import { Drawer, Typography, Empty } from "antd";
 import { Node } from "@xyflow/react";
-import { Plugin } from "@/utils/constant";
+import { Plugin } from "@/types/plugins";
 import FunctionForm from "./forms/FunctionForm";
 
 const { Title } = Typography;

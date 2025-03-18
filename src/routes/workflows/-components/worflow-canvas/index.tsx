@@ -12,25 +12,27 @@ import {
   Node,
   Edge,
 } from "@xyflow/react";
-import { Plugin } from "@/utils/constant";
+import { Plugin } from "@/types/plugins";
 import { FunctionPlugin } from "./convas/plugins/function-plugin";
 import { WorkflowResponse } from "@/api/types";
 import WorkflowDrawer from "../workflow-drawer";
-import { LoopPlugin } from "./convas/plugins/loop-plugin";
 import { StartPlugin } from "./convas/plugins/begin-plugin";
-import { SwitchPlugin } from "./convas/plugins/switch-plugin";
+import { IfElsePlugin } from "./convas/plugins/iflese-plugin";
 import { ButtonEdge } from "./convas/edge";
 import { useWorkflowState } from "./hooks/useWorkflowState";
 import { useWorkflowConnections } from "./hooks/useWorkflowConnections";
 import { useWorkflowDragDrop } from "./hooks/useWorkflowDragDrop";
 import { useWorkflowForm } from "./hooks/useWorkflowForm";
+import { ConsumerPlugin } from "./convas/plugins/consumer-plugin";
+import { MessagePlugin } from "./convas/plugins/message-plugin";
 
 // Node type mapping
 const nodeTypes: NodeTypes = {
   [Plugin.FUNCTION]: FunctionPlugin,
   [Plugin.START]: StartPlugin,
-  [Plugin.IF_ELSE]: SwitchPlugin,
-  [Plugin.LOOP]: LoopPlugin,
+  [Plugin.IF_ELSE]: IfElsePlugin,
+  [Plugin.MESSAGE]: MessagePlugin,
+  [Plugin.CONSUMER]: ConsumerPlugin,
 } as const;
 
 // Edge type mapping

@@ -1,7 +1,7 @@
-import { LoopPluginProps } from "../../types";
+import { ConsumerPluginProps } from "@/types/plugins";
 import { Position, Handle, NodeProps } from "@xyflow/react";
 
-export const LoopPlugin: React.FC<NodeProps<LoopPluginProps>> = ({
+export const ConsumerPlugin: React.FC<NodeProps<ConsumerPluginProps>> = ({
   data,
   selected,
 }) => {
