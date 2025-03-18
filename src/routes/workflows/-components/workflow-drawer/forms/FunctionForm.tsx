@@ -1,72 +1,61 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select } from "antd";
-import { Node } from "@xyflow/react";
-import { FormData } from "..";
+import { Form, Input } from "antd";
+import {
+  FunctionFormValues,
+  FunctionPluginFormProps,
+} from "@/types/plugin-form";
 
-export interface FunctionFormProps {
-  node: Node;
-  onChange?: (formData: FormData) => void;
-}
-
-const FunctionForm: React.FC<FunctionFormProps> = ({ node, onChange }) => {
+const FunctionForm: React.FC<FunctionPluginFormProps> = ({
+  selectedNode,
+  onValuesChange,
+}) => {
   const [form] = Form.useForm();
 
   // Initialize form with node data
   useEffect(() => {
-    if (node && node.data) {
+    if (selectedNode && selectedNode.data) {
       form.setFieldsValue({
-        name: node.data.name || "",
-        description: node.data.description || "",
-        functionType: node.data.functionType || "default",
-        // Add more fields as needed
+        provider: selectedNode.data.provider,
+        type: selectedNode.data.label,
+        remark: selectedNode.data.remark,
+        logic: selectedNode.data.logic,
       });
     }
-  }, [node, form]);
+  }, [selectedNode, form]);
 
   // Handle form values change
-  const handleValuesChange = (_changedValues: unknown, allValues: FormData) => {
-    if (onChange) {
-      onChange(allValues);
+  const handleValuesChange = (
+    _changedValues: unknown,
+    allValues: FunctionFormValues
+  ) => {
+    if (onValuesChange) {
+      onValuesChange(allValues);
     }
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onValuesChange={handleValuesChange}
-      initialValues={{
-        name: "",
-        description: "",
-        functionType: "default",
-      }}
-    >
+    <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
       <Form.Item
-        name="name"
-        label="Function Name"
-        rules={[{ required: true, message: "Please enter a function name" }]}
+        name="provider"
+        label="Provider"
+        rules={[{ required: true, message: "Please enter a provider" }]}
       >
-        <Input placeholder="Enter function name" />
+        <Input placeholder="Enter provider" />
       </Form.Item>
-
-      <Form.Item name="description" label="Description">
-        <Input.TextArea rows={4} placeholder="Enter function description" />
-      </Form.Item>
-
       <Form.Item
-        name="functionType"
-        label="Function Type"
-        rules={[{ required: true, message: "Please select a function type" }]}
+        name="type"
+        label="Type"
+        initialValue={selectedNode?.data.label as string}
       >
-        <Select>
-          <Select.Option value="default">Default Function</Select.Option>
-          <Select.Option value="http">HTTP Request</Select.Option>
-          <Select.Option value="transform">Data Transformation</Select.Option>
-          <Select.Option value="custom">Custom Function</Select.Option>
-        </Select>
+        <Input disabled />
       </Form.Item>
 
-      {/* No submit buttons - form data is saved automatically */}
+      <Form.Item name="remark" label="Remark">
+        <Input.TextArea rows={4} placeholder="Enter remark" />
+      </Form.Item>
+      <Form.Item name="logic" label="Logic">
+        <Input.TextArea rows={9} placeholder="Enter logic" />
+      </Form.Item>
     </Form>
   );
 };

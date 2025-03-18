@@ -3,21 +3,14 @@ import { Drawer, Typography, Empty } from "antd";
 import { Node } from "@xyflow/react";
 import { Plugin } from "@/types/plugins";
 import FunctionForm from "./forms/FunctionForm";
-
+import { PluginFormData } from "@/types/plugin-form";
 const { Title } = Typography;
-
-export type FormData = {
-  name?: string;
-  description?: string;
-  functionType?: string;
-  [key: string]: unknown;
-};
 
 export type WorkflowDrawerProps = {
   open: boolean;
   onClose: () => void;
   selectedNode: Node | null;
-  onFormChange?: (nodeId: string, formData: FormData) => void;
+  onFormChange?: (nodeId: string, formData: PluginFormData) => void;
 };
 
 const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
@@ -40,8 +33,8 @@ const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
       case Plugin.FUNCTION:
         return (
           <FunctionForm
-            node={selectedNode}
-            onChange={(formData) => {
+            selectedNode={selectedNode}
+            onValuesChange={(formData) => {
               if (onFormChange) {
                 onFormChange(selectedNode.id, formData);
               }
@@ -71,14 +64,7 @@ const WorkflowDrawer: React.FC<WorkflowDrawerProps> = ({
       onClose={onClose}
       open={open}
       width={400}
-      mask={false}
-      styles={{
-        body: {
-          paddingBottom: 80,
-        },
-      }}
-      // No footer with buttons - form data is saved automatically
-      footer={null}
+      className="pb-20"
     >
       {renderForm()}
     </Drawer>

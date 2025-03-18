@@ -1,6 +1,6 @@
 import { Node } from "@xyflow/react";
 import { useCallback, useState } from "react";
-import { FormData } from "../../workflow-drawer";
+import { PluginFormData } from "@/types/plugin-form";
 
 type UseWorkflowFormProps = {
     setNodes: (nodes: Node[] | ((nodes: Node[]) => Node[])) => void;
@@ -11,7 +11,7 @@ type UseWorkflowFormReturn = {
     drawerOpen: boolean;
     onNodeClick: (_: React.MouseEvent, node: Node) => void;
     onDrawerClose: () => void;
-    onNodeFormChange: (nodeId: string, formData: FormData) => void;
+    onNodeFormChange: (nodeId: string, formData: PluginFormData) => void;
 };
 
 /**
@@ -35,7 +35,7 @@ export const useWorkflowForm = ({ setNodes }: UseWorkflowFormProps): UseWorkflow
 
     // Update node data when form values change
     const onNodeFormChange = useCallback(
-        (nodeId: string, formData: FormData) => {
+        (nodeId: string, formData: PluginFormData) => {
             setNodes((nds) =>
                 nds.map((node) => {
                     if (node.id === nodeId) {
