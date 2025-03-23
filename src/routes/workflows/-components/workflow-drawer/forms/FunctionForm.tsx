@@ -8,8 +8,16 @@ import {
 const FunctionForm: React.FC<FunctionPluginFormProps> = ({
   selectedNode,
   onValuesChange,
+  formRef,
 }) => {
   const [form] = Form.useForm();
+
+  // 将表单实例赋值给 formRef
+  useEffect(() => {
+    if (formRef) {
+      formRef.current = form;
+    }
+  }, [form, formRef]);
 
   // Initialize form with node data
   useEffect(() => {

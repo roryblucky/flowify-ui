@@ -1,4 +1,6 @@
 import { Node } from "@xyflow/react";
+import { FormInstance } from "antd";
+import { RefObject } from "react";
 
 export interface PluginBaseFormValues {
   provider: string;
@@ -34,6 +36,7 @@ export type PluginFormData =
 export interface PluginFormBasedProps<Values = PluginFormData> {
   selectedNode: Node;
   onValuesChange?: (values: Values) => void;
+  formRef?: RefObject<FormInstance | null>;
 }
 
 export type ConsumerPluginFormProps = PluginFormBasedProps<ConsumerFormValues>;

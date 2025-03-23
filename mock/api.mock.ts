@@ -1,7 +1,14 @@
 import { WorkflowResponse } from '../src/api/types';
 import { defineMock } from 'vite-plugin-mock-dev-server';
-import { Plugin } from '../src/utils/constant';
+
 import { Node, Edge } from '@xyflow/react';
+enum Plugin {
+    START = "Start",
+    CONSUMER = "Consumer",
+    MESSAGE = "Message",
+    IF_ELSE = "If-Else",
+    FUNCTION = "Function_V2",
+}
 
 /**
  * Creates a default start node for new workflows
