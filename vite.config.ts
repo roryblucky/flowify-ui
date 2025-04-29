@@ -8,6 +8,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/flowify/',
   plugins: [
     react(),
     tailwindcss(),

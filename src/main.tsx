@@ -10,6 +10,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   scrollRestoration: true,
+  basepath: "/flowify",
 });
 
 declare module "@tanstack/react-router" {
